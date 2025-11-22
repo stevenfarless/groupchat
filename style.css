@@ -1,0 +1,15 @@
+#chat-section {
+  display: none;
+}
+
+#messages-container {
+  border: 1px solid #000;
+  height: 300px;
+  overflow-y: scroll;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.message {
+  margin-bottom: 5px;
+}
