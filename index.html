@@ -5,6 +5,7 @@
 	<meta charset="UTF-8" />
 	<title>Groupchat</title>
 	<link rel="stylesheet" href="./style.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
@@ -21,12 +22,11 @@
 				database.
 			</p>
 			<p id="auth-status"></p>
-
 		</form>
 	</div>
-	<div id="chat-section" style="display:none;">
+	<div id="chat-section" style="display:none; position: relative;">
 		<h2>Chat</h2>
-		<button onclick="logout()">Logout</button>
+		<button id="logout-btn" onclick="logout()" aria-label="Logout">Logout</button>
 		<p>Logged in as: <span id="user-info"></span></p>
 		<div id="messages-container"></div>
 		<form id="message-form" onsubmit="sendMessage(event)">
