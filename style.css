@@ -110,7 +110,7 @@ button[type="submit"]:hover {
   border-radius: 18px;
   background: #ecf0f1;
   word-break: break-word;
-  font-size: 1.13em;
+  font-size: 1.00em;
 }
 
 /* Responsive for mobile */
