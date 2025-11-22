@@ -1,4 +1,3 @@
-// Replace the following with your Firebase config
 const firebaseConfig = {
 	apiKey: "AIzaSyBO8OQBYVK7D4ic7AABiVuUCXMgoHY5hHM",
 	authDomain: "chat-c3a67.firebaseapp.com",
@@ -8,31 +7,44 @@ const firebaseConfig = {
 	messagingSenderId: "350872002078",
 	appId: "1:350872002078:web:5e990c0043795f300b580f"
 };
-
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.database();
 const usersRef = db.ref("users");
 const messagesRef = db.ref("messages");
 
+// Make bcrypt available globally
+window.bcrypt = window.bcrypt || (window.dcodeIO && window.dcodeIO.bcrypt);
+
 let currentUsername = null;
 
-// Sign Up function with bcrypt password hashing
+// Restore session from localStorage on page load
+window.onload = function () {
+	const savedUsername = localStorage.getItem("chatUsername");
+	if (savedUsername) {
+		// Double-check that user still exists
+		usersRef.child(savedUsername).get().then(snapshot => {
+			if (snapshot.exists()) {
+				currentUsername = savedUsername;
+				switchToChatUI();
+				showAuthStatus("Session restored for " + currentUsername);
+			} else {
+				localStorage.removeItem("chatUsername");
+			}
+		});
+	}
+};
+
+// Sign Up logic with bcrypt
 function signUp() {
-	console.log("Sign Up clicked"); // Debugging
+	console.log("Sign Up clicked");
 	const username = document.getElementById("username").value.trim();
 	const password = document.getElementById("password").value;
-
 	if (!username || !password) {
 		showAuthStatus("Username and password required.");
 		return;
 	}
-
-	usersRef
-		.child(username)
-		.get()
-		.then((snapshot) => {
+	usersRef.child(username).get()
+		.then(snapshot => {
 			if (snapshot.exists()) {
 				showAuthStatus("Username is already taken.");
 			} else {
@@ -41,90 +53,75 @@ function signUp() {
 						showAuthStatus("Error hashing password.");
 						return;
 					}
-					auth
-						.signInAnonymously()
-						.then((userCredential) => {
-							const uid = userCredential.user.uid;
-							usersRef
-								.child(username)
-								.set({
-									passwordHash: hash,
-									uid: uid
-								})
-								.then(() => {
-									currentUsername = username;
-									switchToChatUI();
-									showAuthStatus("Sign up and login successful!");
-								})
-								.catch((dbError) => {
-									showAuthStatus("Database error: " + dbError.message);
-								});
+					usersRef.child(username).set({
+						passwordHash: hash
+					})
+						.then(() => {
+							currentUsername = username;
+							localStorage.setItem("chatUsername", currentUsername);
+							switchToChatUI();
+							showAuthStatus("Sign up and login successful!");
 						})
-						.catch((error) => {
-							showAuthStatus("Firebase auth error: " + error.message);
+						.catch(dbError => {
+							showAuthStatus("Database error: " + dbError.message);
 						});
 				});
 			}
 		})
-		.catch((error) => {
+	usersRef.child(username).set({
+		passwordHash: hash
+	})
+		.then(() => {
+			currentUsername = username;
+			localStorage.setItem("chatUsername", currentUsername);
+			switchToChatUI();
+			showAuthStatus("Sign up and login successful! Your password is securely encrypted before being stored.");
+		})
+		.catch(error => {
 			showAuthStatus("Database error (username lookup): " + error.message);
 		});
 }
 
-// Login function validating password using bcrypt compare
+// Login logic with bcrypt
 function login() {
-	console.log("Login clicked"); // Debugging
+	console.log("Login clicked");
 	const username = document.getElementById("username").value.trim();
 	const password = document.getElementById("password").value;
-
 	if (!username || !password) {
 		showAuthStatus("Username and password required.");
 		return;
 	}
-
-	usersRef
-		.child(username)
-		.get()
-		.then((snapshot) => {
+	usersRef.child(username).get()
+		.then(snapshot => {
 			if (!snapshot.exists()) {
 				showAuthStatus("User not found.");
 				return;
 			}
-			const data = snapshot.val();
-			const storedHash = data.passwordHash;
-
+			const storedHash = snapshot.val().passwordHash;
 			bcrypt.compare(password, storedHash, function (err, res) {
 				if (err) {
 					showAuthStatus("Hash compare error: " + err.message);
 					return;
 				}
 				if (res) {
-					auth
-						.signInAnonymously()
-						.then((userCredential) => {
-							currentUsername = username;
-							switchToChatUI();
-							showAuthStatus("Login successful!");
-						})
-						.catch((error) => {
-							showAuthStatus("Firebase auth error: " + error.message);
-						});
+					currentUsername = username;
+					localStorage.setItem("chatUsername", currentUsername);
+					switchToChatUI();
+					showAuthStatus("Login successful!");
 				} else {
 					showAuthStatus("Incorrect password.");
 				}
 			});
 		})
-		.catch((error) => {
+		.catch(error => {
 			showAuthStatus("Database error (username lookup): " + error.message);
 		});
 }
 
-// Show authentication status messages
 function showAuthStatus(message) {
 	document.getElementById("auth-status").textContent = message;
 }
 
-// Switch UI to Chat
 function switchToChatUI() {
 	document.getElementById("auth-section").style.display = "none";
 	document.getElementById("chat-section").style.display = "block";
@@ -132,24 +129,15 @@ function switchToChatUI() {
 	loadMessages();
 }
 
-// Logout
 function logout() {
-	auth.signOut();
 	currentUsername = null;
+	localStorage.removeItem("chatUsername");
 	document.getElementById("auth-section").style.display = "block";
 	document.getElementById("chat-section").style.display = "none";
 	showAuthStatus("");
 	clearMessages();
 }
 
-// Listen to Firebase auth state change to handle logout externally if needed
-auth.onAuthStateChanged((user) => {
-	if (!user) {
-		logout();
-	}
-});
-
-// Send message
 function sendMessage(e) {
 	e.preventDefault();
 	const text = document.getElementById("message-input").value.trim();
@@ -162,23 +150,20 @@ function sendMessage(e) {
 	document.getElementById("message-input").value = "";
 }
 
-// Load and display messages from Firebase Realtime Database
 function loadMessages() {
 	clearMessages();
 	messagesRef.off();
-	messagesRef.on("child_added", (snapshot) => {
+	messagesRef.on("child_added", snapshot => {
 		const msg = snapshot.val();
 		displayMessage(msg);
 	});
 }
 
-// Clear messages display
 function clearMessages() {
 	const container = document.getElementById("messages-container");
 	container.innerHTML = "";
 }
 
-// Display message
 function displayMessage(message) {
 	const container = document.getElementById("messages-container");
 	const time = new Date(message.timestamp).toLocaleTimeString();
@@ -189,7 +174,7 @@ function displayMessage(message) {
 	container.scrollTop = container.scrollHeight;
 }
 
-// Optional: Add try/catch to window.onerror for easier debugging
+// Optional error debugging
 window.onerror = function (message, source, lineno, colno, error) {
 	showAuthStatus("JS Error: " + message);
 };

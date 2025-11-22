@@ -2,53 +2,43 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<title>Chat</title>
-	<link rel="stylesheet" href="./style.css">
-
+	<meta charset="UTF-8" />
+	<title>Username & Password Firebase Chat</title>
+	<link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
-	<!DOCTYPE html>
-	<html lang="en">
-
-	<head>
-		<meta charset="UTF-8" />
-		<title>Username & Password Firebase Chat</title>
-	</head>
-
-	<body>
-
-		<div id="auth-section">
-			<h2>Login or Sign Up</h2>
-			<input id="username" placeholder="Username" />
-			<input id="password" type="password" placeholder="Password" />
+	<div id="auth-section">
+		<h2>Login or Sign Up</h2>
+		<form id="login-form" autocomplete="on" onsubmit="return false;">
+			<input id="username" type="text" placeholder="Username" autocomplete="username" required />
+			<input id="password" type="password" placeholder="Password" autocomplete="current-password" required />
 			<br /><br />
-			<button onclick="signUp()">Sign Up</button>
-			<button onclick="login()">Login</button>
+			<button onclick="login()" type="button">Login</button>
+			<button onclick="signUp()" type="button">Sign Up</button>
 			<p id="auth-status"></p>
-		</div>
+			<p style="color: #888; font-size: 0.95em; margin-top:6px;">
+				Your password is securely encrypted with industry-standard cryptography before being stored in the
+				database.
+			</p>
 
-		<div id="chat-section">
-			<h2>Group Chat</h2>
-			<p>Logged in as: <span id="user-info"></span></p>
-			<button onclick="logout()">Logout</button>
-			<div id="messages-container"></div>
-			<form id="message-form" onsubmit="sendMessage(event)">
-				<input id="message-input" placeholder="Type message..." autocomplete="off" required />
-				<button type="submit">Send</button>
-			</form>
-		</div>
-
-	</body>
-
-	</html>
-	<script src='https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js'></script>
-	<script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js'></script>
-	<script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js'></script>
-	<script src='https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js'></script>
-	<script src="./script.js"></script>
-
+		</form>
+	</div>
+	<div id="chat-section" style="display:none;">
+		<h2>Group Chat</h2>
+		<p>Logged in as: <span id="user-info"></span></p>
+		<button onclick="logout()">Logout</button>
+		<div id="messages-container"></div>
+		<form id="message-form" onsubmit="sendMessage(event)">
+			<input id="message-input" placeholder="Type message..." autocomplete="off" required />
+			<button type="submit">Send</button>
+		</form>
+	</div>
+	<!-- Script order: bcrypt first, Firebase next, then your code last -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+	<script src="script.js"></script>
 </body>
 
 </html>
