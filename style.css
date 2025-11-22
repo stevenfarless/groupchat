@@ -1,3 +1,4 @@
+/* Base body and typography */
 body {
   margin: 0;
   font-family: system-ui, Arial, sans-serif;
@@ -15,12 +16,14 @@ body {
   box-sizing: border-box;
 }
 
+/* Forms stacked vertically with gap */
 form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+/* Input fields and buttons */
 input,
 button {
   font-size: 1.1em;
@@ -31,11 +34,13 @@ button {
   outline: none;
 }
 
+/* Focus outline color highlight */
 input:focus,
 button:focus {
   border-color: #3498db;
 }
 
+/* Button styling */
 button {
   background: #3498db;
   color: #fff;
@@ -48,6 +53,7 @@ button:hover {
   background: #2980b9;
 }
 
+/* Message container: white background with subtle shadows, scrollable */
 #messages-container {
   background: #fff;
   border-radius: 8px;
@@ -60,6 +66,7 @@ button:hover {
   font-size: 1.1em;
 }
 
+/* Individual chat message styling */
 .message {
   margin-bottom: 9px;
   padding: 7px;
@@ -68,35 +75,59 @@ button:hover {
   word-break: break-word;
 }
 
+/* User info text weight */
 #user-info {
   font-weight: 600;
 }
 
+/* Mobile responsiveness enhancements */
 @media (max-width: 600px) {
-
   body,
   #auth-section,
   #chat-section {
-    padding: 2vw;
+    padding: 4vw;          /* More padding for touch comfort */
+    font-size: 1.2em;      /* Larger base font on mobile */
+  }
+
+  h2, h3 {
+    font-size: 2em;        /* Larger headings for clarity */
+    margin-top: 10px;
+    margin-bottom: 14px;
   }
 
   form,
   #messages-container {
-    font-size: 1em;
+    font-size: 1.15em;
   }
 
   .message {
-    font-size: 1em;
+    font-size: 1.1em;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
   }
 
   input,
   button {
-    padding: 10px;
-    font-size: 1em;
+    padding: 14px;
+    font-size: 1.15em;
+    border-radius: 10px;
+    margin-bottom: 14px;
   }
 
   #messages-container {
-    max-height: 33vh;
-    min-height: 80px;
+    max-height: 55vh;
+    min-height: 120px;
+    padding: 14px;
+  }
+
+  /* Logout button styling if present */
+  #logout-btn {
+    padding: 13px 18px;
+    font-size: 1.13em;
+    right: 8px;
+    top: 8px;
+    border-radius: 10px;
+    position: absolute;
   }
 }
