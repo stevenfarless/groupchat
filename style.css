@@ -106,11 +106,11 @@ button[type="submit"]:hover {
 
 .message {
   margin-bottom: 13px;
-  padding: 10px 14px;
+  padding: 10px 10px;
   border-radius: 18px;
   background: #ecf0f1;
   word-break: break-word;
-  font-size: 1.00em;
+  font-size: 1.0em;
 }
 
 /* Responsive for mobile */
